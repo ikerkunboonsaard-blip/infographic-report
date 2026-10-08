@@ -31,7 +31,7 @@
     .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; }
     .btn-primary { background: #0f4c81; color: white; }
     .btn-primary:hover { background: #0a355c; }
-    .btn-success { background: #2e7d32; color: white; font-size: 16px; padding: 12px 24px; }
+    .btn-success { background: #2e7d32; color: white; font-size: 16px; padding: 12px 24px; width: 100%; margin-top: 10px; }
     .btn-success:hover { background: #1b5e20; }
     .btn-danger { background: #c62828; color: white; padding: 6px 12px; font-size: 12px; }
     .btn-add { background: #0288d1; color: white; padding: 8px 14px; font-size: 13px; margin-top: 5px; }
@@ -62,9 +62,13 @@
     .canvas-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
 
     .header-box { text-align: center; border-bottom: 2px solid var(--gold-primary); padding-bottom: 15px; margin-bottom: 20px; }
-    .logo-img { max-height: 70px; margin-bottom: 8px; }
+    
+    /* Logo Box */
+    .logo-container { margin-bottom: 10px; display: flex; justify-content: center; align-items: center; }
+    .logo-img { height: 75px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+    .logo-img.circle { border-radius: 50%; border: 2px solid var(--gold-primary); }
+
     .header-title { font-size: 26px; font-weight: 700; color: var(--gold-secondary); text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
-    .header-subtitle { font-size: 18px; color: #ffffff; }
     .month-badge { display: inline-block; background: linear-gradient(90deg, #d4af37, #f3e5ab, #d4af37); color: #000; font-weight: 700; padding: 4px 20px; border-radius: 20px; margin-top: 8px; font-size: 16px; }
 
     .photo-grid { display: grid; gap: 10px; margin-bottom: 20px; }
@@ -96,230 +100,4 @@
 <body>
 
 <div class="app-container">
-  <!-- FORM PANEL -->
-  <div class="form-panel">
-    <h2 style="color:#0f4c81; margin-bottom:15px; border-bottom:2px solid #0f4c81; padding-bottom:5px;">📝 ฟอร์มกรอกข้อมูลรายงาน</h2>
-    
-    <div class="form-group">
-      <label>1. ข้อความส่วนหัว / หน่วยงาน</label>
-      <input type="text" id="inputAgency" value="ฝ่ายเครื่องจักรกล กองช่าง อบจ.สุพรรณบุรี" oninput="updateView()">
-    </div>
-    
-    <div class="form-group">
-      <label>2. หัวข้อรายงาน / ประจำเดือน</label>
-      <input type="text" id="inputTitle" value="สรุปผลการปฏิบัติงาน ประจำวันที่ 8 ตุลาคม 2569" oninput="updateView()">
-    </div>
-
-    <div class="form-group">
-      <label>3. รายชื่อผู้ปฏิบัติงาน (เพิ่มได้หลายคน)</label>
-      <div id="staffInputsContainer"></div>
-      <button class="btn btn-add" onclick="addStaffInput()">+ เพิ่มผู้ปฏิบัติงาน</button>
-    </div>
-
-    <div class="form-group">
-      <label>4. อัปโหลดรูปภาพผลงาน (เลือกได้หลายรูป)</label>
-      <input type="file" id="inputPhotos" multiple accept="image/*" onchange="handlePhotos(this)">
-      <div style="margin-top:8px;">
-        <label>จำนวนคอลัมน์แสดงรูปภาพ:</label>
-        <select id="gridCols" onchange="updateView()">
-          <option value="2">2 คอลัมน์</option>
-          <option value="3" selected>3 คอลัมน์</option>
-          <option value="4">4 คอลัมน์</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>5. ภารกิจแยกตามพื้นที่/อำเภอ</label>
-      <div id="areaInputsContainer"></div>
-      <button class="btn btn-add" onclick="addAreaInput()">+ เพิ่มพื้นที่/หน่วยงาน</button>
-    </div>
-
-    <div style="margin-top:25px; text-align:center;">
-      <button class="btn btn-success" onclick="downloadPNG()">📸 ดาวน์โหลดเป็นรูปภาพ (PNG)</button>
-    </div>
-  </div>
-
-  <!-- PREVIEW PANEL -->
-  <div class="preview-panel">
-    <div id="infographic-canvas">
-      <div class="bg-overlay"></div>
-      <div class="canvas-content">
-        <div>
-          <div class="header-box">
-            <div class="header-title" id="viewAgency">ฝ่ายเครื่องจักรกล กองช่าง อบจ.สุพรรณบุรี</div>
-            <div class="month-badge" id="viewTitle">สรุปผลการปฏิบัติงาน ประจำวันที่ 8 ตุลาคม 2569</div>
-          </div>
-
-          <div class="photo-grid photo-grid-3" id="viewPhotoGrid">
-            <div class="photo-card"><img src="https://via.placeholder.com/300x200/0f4c81/ffffff?text=Sample+Photo+1"></div>
-            <div class="photo-card"><img src="https://via.placeholder.com/300x200/0f4c81/ffffff?text=Sample+Photo+2"></div>
-            <div class="photo-card"><img src="https://via.placeholder.com/300x200/0f4c81/ffffff?text=Sample+Photo+3"></div>
-          </div>
-
-          <div class="task-section">
-            <div class="section-title">📍 การดำเนินงานสรุปตามพื้นที่ปฏิบัติงาน</div>
-            <div class="area-grid" id="viewAreaGrid"></div>
-          </div>
-        </div>
-
-        <div class="staff-section">
-          <div class="section-title" style="font-size:15px; margin-bottom:6px;">👷‍♂️ ผู้ปฏิบัติงาน / เจ้าหน้าที่รับผิดชอบ</div>
-          <div class="staff-grid" id="viewStaffGrid"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  let staffList = [
-    { name: "นายสมชาย ใจดี", role: "พนักงานขับเครื่องจักรกล" },
-    { name: "นายวิชัย รักงาน", role: "นายช่างโยธาปฏิบัติงาน" }
-  ];
-
-  let areaList = [
-    { name: "อำเภอเมือง", tasks: "ขุดลอกคลองส่งน้ำ\nปรับพื้นที่สาธารณะ" },
-    { name: "อำเภอบางปะหัน", tasks: "ขนย้ายเครื่องจักรกลเข้าพื้นที่" }
-  ];
-
-  let uploadedPhotos = [];
-
-  function init() {
-    renderStaffInputs();
-    renderAreaInputs();
-    updateView();
-  }
-
-  // Staff Handlers
-  function renderStaffInputs() {
-    const container = document.getElementById('staffInputsContainer');
-    container.innerHTML = '';
-    staffList.forEach((staff, index) => {
-      container.innerHTML += `
-        <div class="staff-input-item">
-          <input type="text" placeholder="ชื่อ-นามสกุล" value="${staff.name}" oninput="staffList[${index}].name = this.value; updateView();">
-          <input type="text" placeholder="ตำแหน่ง" value="${staff.role}" oninput="staffList[${index}].role = this.value; updateView();">
-          <button class="btn btn-danger" onclick="removeStaff(${index})">ลบ</button>
-        </div>
-      `;
-    });
-  }
-
-  function addStaffInput() {
-    staffList.push({ name: "", role: "" });
-    renderStaffInputs();
-    updateView();
-  }
-
-  function removeStaff(index) {
-    staffList.splice(index, 1);
-    renderStaffInputs();
-    updateView();
-  }
-
-  // Area Handlers
-  function renderAreaInputs() {
-    const container = document.getElementById('areaInputsContainer');
-    container.innerHTML = '';
-    areaList.forEach((area, index) => {
-      container.innerHTML += `
-        <div style="background:#f9f9f9; padding:10px; border-radius:6px; margin-bottom:10px; border:1px solid #ddd;">
-          <input type="text" placeholder="ชื่อพื้นที่/อำเภอ" value="${area.name}" oninput="areaList[${index}].name = this.value; updateView();" style="margin-bottom:6px;">
-          <textarea placeholder="รายการภารกิจ (ขึ้นบรรทัดใหม่เพื่อแยกข้อ)" oninput="areaList[${index}].tasks = this.value; updateView();">${area.tasks}</textarea>
-          <button class="btn btn-danger" onclick="removeArea(${index})" style="margin-top:6px;">ลบพื้นที่นี้</button>
-        </div>
-      `;
-    });
-  }
-
-  function addAreaInput() {
-    areaList.push({ name: "", tasks: "" });
-    renderAreaInputs();
-    updateView();
-  }
-
-  function removeArea(index) {
-    areaList.splice(index, 1);
-    renderAreaInputs();
-    updateView();
-  }
-
-  // Photo Handlers
-  function handlePhotos(input) {
-    if (input.files) {
-      uploadedPhotos = [];
-      Array.from(input.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          uploadedPhotos.push(e.target.result);
-          updatePhotosView();
-        }
-        reader.readAsDataURL(file);
-      });
-    }
-  }
-
-  function updatePhotosView() {
-    const grid = document.getElementById('viewPhotoGrid');
-    if (uploadedPhotos.length === 0) return;
-    grid.innerHTML = '';
-    uploadedPhotos.forEach(src => {
-      grid.innerHTML += `<div class="photo-card"><img src="${src}"></div>`;
-    });
-  }
-
-  // View Updater
-  function updateView() {
-    document.getElementById('viewAgency').innerText = document.getElementById('inputAgency').value;
-    document.getElementById('viewTitle').innerText = document.getElementById('inputTitle').value;
-
-    // Grid cols
-    const cols = document.getElementById('gridCols').value;
-    const photoGrid = document.getElementById('viewPhotoGrid');
-    photoGrid.className = `photo-grid photo-grid-${cols}`;
-
-    // Staff Grid
-    const staffGrid = document.getElementById('viewStaffGrid');
-    staffGrid.innerHTML = '';
-    staffList.forEach(s => {
-      if(s.name) {
-        staffGrid.innerHTML += `
-          <div class="staff-card">
-            <div class="staff-name">${s.name}</div>
-            <div class="staff-role">${s.role || '-'}</div>
-          </div>
-        `;
-      }
-    });
-
-    // Area Grid
-    const areaGrid = document.getElementById('viewAreaGrid');
-    areaGrid.innerHTML = '';
-    areaList.forEach(a => {
-      if(a.name) {
-        const tasksHtml = a.tasks.split('\n').filter(t => t.trim() !== '').map(t => `<li>${t}</li>`).join('');
-        areaGrid.innerHTML += `
-          <div class="area-box">
-            <div class="area-name">📍 ${a.name}</div>
-            <ul class="task-list">${tasksHtml}</ul>
-          </div>
-        `;
-      }
-    });
-  }
-
-  function downloadPNG() {
-    const canvas = document.getElementById('infographic-canvas');
-    html2canvas(canvas, { scale: 2 }).then(c => {
-      const link = document.createElement('a');
-      link.download = 'รายงานผลการปฏิบัติงาน.png';
-      link.href = c.toDataURL();
-      link.click();
-    });
-  }
-
-  window.onload = init;
-</script>
-</body>
-</html>
+  <!-- FORM PANEL
